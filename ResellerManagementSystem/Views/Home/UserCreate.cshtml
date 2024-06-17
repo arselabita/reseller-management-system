@@ -1,0 +1,159 @@
+﻿
+@{
+    ViewBag.Title = "UserCreate";
+}
+
+
+<!-- Earnings (Monthly) Card Example -->
+<div class="col-xl-12 col-md-12 mb-12">
+    <div class="card border-left-primary shadow h-100 py-2">
+        <div class="card-body">
+            <div class="row no-gutters align-items-center">
+                <div class="col mr-2">
+
+                    <form class="user">
+
+                        <div class="form-group col-md-6">
+                            <div class="text-xs font-weight-bold text-primary text-uppercase mb-1">Reseller Create</div>
+                        </div>
+                        <input type="hidden" id="exampleInputUserId" />
+                        <input type="hidden" id="status" />
+                        <div class="form-group col-md-6">
+                            <input type="text" class="form-control form-control-user" id="exampleInputUser" aria-describedby="emailHelp" placeholder="Username">
+                        </div>
+                        <div class="form-group col-md-6">
+                            <input type="password" class="form-control form-control-user" id="exampleInputPassword" placeholder="Password">
+                        </div>
+                        <div class="form-group col-md-6">
+                            <input type="password" class="form-control form-control-user" id="exampleInputPasswordRetype" placeholder="Re-Type Password">
+                        </div>
+                        <div class="form-group col-md-6">
+                            <select class="form-control" id="role">
+                                <option value="">--Select--</option>
+                                <option value="Admin">Admin</option>
+                                <option value="Editor">Editor</option>
+                            </select>
+                        </div>
+                        <div class="form-group col-md-6">
+                            <a href="#" onclick="SaveUser()" class="btn btn-primary btn-sm">
+                                Save
+                            </a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<br/>
+
+<div class="col-xl-12 col-md-12 mb-12">
+    <div class="card border-left-primary shadow h-100 py-2">
+        <div class="card-body">
+            <div class="row no-gutters align-items-center">
+                <div class="col mr-2">
+                    <div class="form-group col-md-6">
+                        <div class="text-xs font-weight-bold text-primary text-uppercase mb-1">Reseller Create</div>
+                    </div>
+
+                    <table class="table table-bordered" id="dataTable" width="100%" cellspacing="0">
+                        <thead>
+                            <tr>
+                                <th>User name</th>
+                                <th>Role</th>
+                                <th>Status</th>
+                                <th>
+                                    Action
+                                </th>
+                            </tr>
+                        </thead>
+                        <tbody id="trDiv">
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    $(function () {
+        GetAllUser();
+    });
+
+    function SaveUser() {
+        var user = new Object();
+        user.UserId = $("#exampleInputUserId").val();
+        user.Username = $("#exampleInputUser").val();
+        user.Password = $("#exampleInputPassword").val();
+        user.Role = $("#role").val();
+        user.Status = $("#status").val();
+        var data = JSON.stringify({
+            user: user
+        });
+        return $.ajax({
+            contentType: 'application/json; charset=utf-8',
+            dataType: 'json',
+            type: 'POST',
+            url: "/Home/SaveUser",
+            data: data,
+            success: function (result) {
+                if (result == true) {
+                    GetAllUser();
+                    Reset();
+                    alert("Save Success!");
+                }
+                else {
+                    alert("Save failed!");
+                }
+            },
+            error: function () {
+                alert("Error!")
+            }
+        });
+    }
+
+    function GetAllUser() {
+        $.ajax({
+            contentType: 'application/json; charset=utf-8',
+            dataType: 'json',
+            type: 'Get',
+            url: "/Home/GetAllUser",
+            success: function (data) {
+                $("#trDiv").html('');
+                var tdContent = '';
+                for (var i = 0; i < data.length; i++) {
+                    tdContent += '<tr><td>' + data[i].Username + '</td><td>' + data[i].Role + '</td>' + '<td>' + data[i].Status + '</td>' + '<td><a href="#" onclick="Edit(' + data[i].UserId + ",'" + data[i].Username + "','" + data[i].Password + "','" + data[i].Role + "'," + data[i].Status + ');">Edit</a></td></tr>'; // if Name is property of your Person object
+                }
+                $("#trDiv").append(tdContent);
+            },
+            error: function () {
+                alert("Error!")
+            }
+        });
+    }
+    function Edit(UserId, Username, Password, Role, Status) {
+        $("#exampleInputUserId").val(UserId);
+        $("#exampleInputUser").val(Username);
+        $("#exampleInputPassword").val(Password);
+        $("#exampleInputPasswordRetype").val(Password);
+        $("#role").val(Role);
+        $("#status").val(Status);
+        $("#exampleInputPassword").hide();
+        $("#exampleInputPasswordRetype").hide();
+    }
+    function Reset() {
+        $("#exampleInputUserId").val(null);
+        $("#exampleInputUser").val(null);
+        $("#exampleInputPassword").val(null);
+        $("#exampleInputPasswordRetype").val(null);
+        $("#role").val(null);
+        $("#status").val(null);
+        $("#exampleInputPassword").show();
+        $("#exampleInputPasswordRetype").show();
+    }
+ 
+</script>
+
+
